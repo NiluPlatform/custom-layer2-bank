@@ -1,0 +1,26 @@
+.row.display-flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+.row.display-flex > [class*='col-'] {
+  display: flex;
+  flex-direction: column;
+}
+.done {
+  background: #28a745;
+  color: white;
+  text-align: center;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+  transition: color .2s;
+}
+.loading img {
+  max-width: 100%;
+  transition: color .2s;
+}
+.small, small {
+  font-size: 75%;
+}
