@@ -52,6 +52,7 @@ function App() {
     const [BankAdminBTN, BankAdminBTNStateHandler] = useState("");
     const [BankBTN, BankBTNStateHandler] = useState("");
     const [IngressBTN, IngressBTNStateHandler] = useState("");
+    const [DefineBTN, DefineBTNBTNStateHandler] = useState(true);
 
     const privateKeyInputHandler = (event) => {
         privateKeyStateHandler(event.target.value)
@@ -293,6 +294,26 @@ function App() {
         });
     };
 
+    const defineToIngress = () => {
+        DefineBTNBTNStateHandler(false);
+        let newOutput = output;
+        try {
+            let myIngress = web3.eth.contract(Nilu.ingress_abi).at(IngressAddress);
+            let myBank = web3.eth.contract(Nilu.bank_abi).at(BankAddress);
+            let myBankAdmin = web3.eth.contract(Nilu.admin_abi).at(BankAdminAddress);
+            myIngress.setCustomerContract(myBank.getContractAddress());
+            myIngress.setAdminContract(myBankAdmin.getContractAddress());
+            newOutput = newOutput + 'Successfully defined to ingress';
+            outputStateHandler(newOutput);
+        }catch (e) {
+            console.log(e);
+            newOutput = newOutput + 'Error in define to ingress';
+            outputStateHandler(newOutput);
+            DefineBTNBTNStateHandler(true);
+        }
+
+    };
+
     return (
         <div>
             <h1 className="text-center">Bank Engine</h1>
@@ -333,7 +354,10 @@ function App() {
                                         contract by yourself and put the smart contract's address here. Otherwise, left
                                         this field empty, and the bank engine will do it automatically.</small>
                                 </div>
+                                <div
+                                className={`${BankAdminAddress === undefined || BankAdminAddress === "" || BankAdminAddress === null ? "d-block" : "d-none"}`}>
                                 <CreationBTN text="Create Bank Admin" state={BankAdminBTN} click={createBankAdmin}/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -401,8 +425,13 @@ function App() {
                     </div>
                 </div>
                 <div className="row">
-                    <button type="button" onClick={saveData} style={{width: "50%", margin: "10px auto"}}
+                    <button type="button" onClick={saveData} style={{width: "30%", margin: "10px auto"}}
                             className="btn btn-primary">Save
+                    </button>
+                </div>
+                    <div className="row">
+                    <button type="button"  style={{width: "30%", margin: "10px auto"}} onClick={defineToIngress}
+                            className={`btn btn-success ${IngressAddress && BankAddress && BankAdminAddress && DefineBTN? "d-block" : "d-none"}`}>Define Bank and admin bank to ingress
                     </button>
                 </div>
 
