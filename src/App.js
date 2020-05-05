@@ -210,10 +210,9 @@ function App() {
                     console.log('Transaction Hash is :', txHash);
                     console.log('error:', err);
                     outputStateHandler(newOutput);
-                    //txHash ? BankAdminBTNStateHandler("done") : BankAdminBTNStateHandler(false);
                 }).then((instance) => {
                     console.log(instance);
-                    newOutput = `Bank Admin Address :${instance.contractAddress}\n BlockHash : ${instance.blockHash} \n Block blockHash Number ${instance.blockblockHashNumber}\n * End creating bank *`
+                    newOutput = `Bank Admin Address :${instance.contractAddress}\n BlockHash : ${instance.blockHash} \n Block blockHash Number ${instance.blockNumber}\n * End creating bank *`
                     BankAdminAddressStateHandler(instance.contractAddress);
                     outputStateHandler(newOutput);
                     BankAdminBTNStateHandler("done")
@@ -274,8 +273,8 @@ function App() {
                     outputStateHandler(newOutput)
                 }).then((instance) => {
                     console.log(instance);
-                    newOutput = `Ingress Address :${instance.contractAddress}\n BlockHash : ${instance.blockHash} \nBlock blockHash Number ${instance.blockblockHashNumber}\n* End creating bank *`
-                    BankAdminAddressStateHandler(instance.contractAddress);
+                    newOutput = newOutput + `Ingress Address :${instance.contractAddress}\n BlockHash : ${instance.blockHash} \nBlock blockHash Number ${instance.blockNumber}\n* End creating bank *`;
+                    IngressAddressStateHandler(instance.contractAddress);
                     outputStateHandler(newOutput);
                     IngressBTNStateHandler("done");
                 }).catch(error => {
