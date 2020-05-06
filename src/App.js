@@ -156,7 +156,7 @@ function App() {
                     outputStateHandler(newOutput)
                 }).then((instance) => {
                     console.log(instance);
-                    newOutput = `Bank Address :${instance.contractAddress}\n BlockHash : ${instance.blockHash} \n Block blockHash Number ${instance.blockblockHashNumber}\n * End creating bank *`
+                    newOutput = `Bank Address :${instance.contractAddress}\n BlockHash : ${instance.blockHash} \n Block blockHash Number ${instance.blockNumber}\n * End creating bank *`
                     BankAddressStateHandler(instance.contractAddress);
                     outputStateHandler(newOutput);
                     BankBTNStateHandler("done")
@@ -297,11 +297,9 @@ function App() {
         DefineBTNBTNStateHandler(false);
         let newOutput = output;
         try {
-            let myIngress = web3.eth.contract(Nilu.ingress_abi).at(IngressAddress);
-            let myBank = web3.eth.contract(Nilu.bank_abi).at(BankAddress);
-            let myBankAdmin = web3.eth.contract(Nilu.admin_abi).at(BankAdminAddress);
-            myIngress.setCustomerContract(myBank.getContractAddress());
-            myIngress.setAdminContract(myBankAdmin.getContractAddress());
+            let myIngress = new web3.eth.Contract(Nilu.ingress_abi , IngressAddress);
+            myIngress.methods.setCustomerContract( BankAddress );
+            myIngress.methods.setAdminContract( BankAdminAddress );
             newOutput = newOutput + 'Successfully defined to ingress';
             outputStateHandler(newOutput);
         }catch (e) {
