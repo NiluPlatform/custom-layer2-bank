@@ -192,7 +192,6 @@ function App() {
 
         web3.eth.getGasPrice().then((gasPrice) => {
             web3.eth.getTransactionCount(address, (err, txCount) => {
-                console.log(txCount);
                 const myTx = {
                     nonce: web3.utils.toHex(txCount),
                     from: address,
@@ -293,22 +292,92 @@ function App() {
         });
     };
 
-    const defineToIngress = () => {
+    const defineToIngress = async () => {
         DefineBTNBTNStateHandler(false);
         let newOutput = output;
         try {
             let myIngress = new web3.eth.Contract(Nilu.ingress_abi , IngressAddress);
-            myIngress.methods.setCustomerContract( BankAddress );
-            myIngress.methods.setAdminContract( BankAdminAddress );
-            newOutput = newOutput + 'Successfully defined to ingress';
-            outputStateHandler(newOutput);
+            const privateKeyToBuffer = EthUtil.toBuffer(privateKey);
+            const data = myIngress.methods.setCustomerContract(BankAddress).encodeABI();
+
+
+            newOutput = newOutput + '\nStart set Customer address to ingress';
+            web3.eth.getGasPrice().then((gasPrice) => {
+                web3.eth.getTransactionCount(address, (err, txCount) => {
+                    const myTx = {
+                        nonce: web3.utils.toHex(txCount),
+                        from: address,
+                        gasLimit: web3.utils.toHex(4000000),
+                        gasPrice: web3.utils.toHex(gasPrice),
+                        "to": IngressAddress,
+                        data: data
+                    };
+                    const setCustomer = new Tx(myTx);
+                    setCustomer.sign(privateKeyToBuffer);
+                    const raw_Tx1 = '0x' + setCustomer.serialize().toString('hex');
+                    web3.eth.sendSignedTransaction(raw_Tx1, (err, txHash) => {
+                        console.log('Transaction Hash is :', txHash);
+                        newOutput = newOutput +`\nTransaction Hash is : ${txHash}`;
+                        outputStateHandler(newOutput);
+                    }).then((instance) => {
+                        console.log('instance' , instance);
+                        newOutput = newOutput +`\nStatus is : ${instance.status}`;
+                        outputStateHandler(newOutput);
+                        defineAdminToIngress(newOutput);
+                    }).catch(error => {
+                        console.log('error' , error);
+                        newOutput = newOutput +`\nError occurred  : ${error}`;
+                        outputStateHandler(newOutput);
+                        DefineBTNBTNStateHandler(true);
+                    })
+                })
+            });
+
+
         }catch (e) {
             console.log(e);
-            newOutput = newOutput + 'Error in define to ingress';
+            newOutput = newOutput + 'Error in set Bank Address to ingress';
             outputStateHandler(newOutput);
             DefineBTNBTNStateHandler(true);
         }
 
+    };
+
+    const defineAdminToIngress  = (newOutput) =>{
+        const privateKeyToBuffer = EthUtil.toBuffer(privateKey);
+        let myIngress = new web3.eth.Contract(Nilu.ingress_abi , IngressAddress);
+        const data2 = myIngress.methods.setAdminContract(BankAdminAddress).encodeABI();
+
+        newOutput = newOutput + '\nStart set Admin Contract address to ingress';
+        web3.eth.getGasPrice().then((gasPrice) => {
+            web3.eth.getTransactionCount(address, (err, txCount) => {
+                const myTx = {
+                    nonce: web3.utils.toHex(txCount),
+                    from: address,
+                    gasLimit: web3.utils.toHex(4000000),
+                    gasPrice: web3.utils.toHex(gasPrice),
+                    "to": IngressAddress,
+                    data: data2
+                };
+                const setCustomer = new Tx(myTx);
+                setCustomer.sign(privateKeyToBuffer);
+                const raw_Tx1 = '0x' + setCustomer.serialize().toString('hex');
+                web3.eth.sendSignedTransaction(raw_Tx1, (err, txHash) => {
+                    console.log('Transaction Hash is :', txHash);
+                    newOutput = newOutput +`\nTransaction Hash is : ${txHash}`;
+                    outputStateHandler(newOutput);
+                }).then((instance) => {
+                    console.log('instance' , instance);
+                    newOutput = newOutput +`\nStatus is : ${instance.status}`;
+                    outputStateHandler(newOutput);
+                }).catch(error => {
+                    console.log('error' , error);
+                    newOutput = newOutput +`\nError occurred  : ${error}`;
+                    outputStateHandler(newOutput);
+                    DefineBTNBTNStateHandler(true);
+                })
+            })
+        });
     };
 
     return (
